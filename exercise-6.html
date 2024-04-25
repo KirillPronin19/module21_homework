@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Image Gallery</title>
+<style>
+  .error {
+    color: red;
+  }
+</style>
+</head>
+<body>
+
+<input type="number" id="pageInput" placeholder="номер страницы">
+<input type="number" id="limitInput" placeholder="лимит">
+<button id="requestButton">запрос</button>
+
+<div id="errorMessage" class="error"></div>
+<div id="imageList"></div>
+
+<script>
+// Функция для проверки, является ли число в диапазоне от 1 до 10
+function isNumberInRange(number) {
+  return number >= 1 && number <= 10;
+}
+
+// Функция для обработки клика на кнопку
+function handleRequestButtonClick() {
+  const pageInput = document.getElementById('pageInput');
+  const limitInput = document.getElementById('limitInput');
+  const pageNumber = parseInt(pageInput.value, 10);
+  const limitNumber = parseInt(limitInput.value, 10);
+
+  // Проверяем, являются ли введенные числа числами и находятся ли они в диапазоне
+  if (!isNumberInRange(pageNumber) || !isNumberInRange(limitNumber)) {
+    displayErrorMessage('Номер страницы и лимит вне диапазона от 1 до 10');
+    return;
+  }
+
+  // Проверяем, являются ли введенные числа числами и находятся ли они в диапазоне
+  if (!isNumberInRange(pageNumber) || !isNumberInRange(limitNumber)) {
+    displayErrorMessage('Номер страницы вне диапазона от 1 до 10');
+    return;
+  }
+
+  // Проверяем, являются ли введенные числа числами и находятся ли они в диапазоне
+  if (!isNumberInRange(pageNumber) || !isNumberInRange(limitNumber)) {
+    displayErrorMessage('Лимит вне диапазона от 1 до 10');
+    return;
+  }
+
+  // Если все числа в диапазоне, делаем запрос
+  fetch(`https://picsum.photos/v2/list?page=${pageNumber}&limit=${limitNumber}`)
+    .then(response => response.json())
+    .then(data => {
+      displayImages(data);
+    })
+    .catch(error => {
+      displayErrorMessage('Произошла ошибка при выполнении запроса');
+    });
+}
+
+// Функция для отображения ошибок
+function displayErrorMessage(message) {
+  const errorMessage = document.getElementById('errorMessage');
+  errorMessage.textContent = message;
+}
+
+// Функция для отображения изображений
+function displayImages(images) {
+  const imageList = document.getElementById('imageList');
+  imageList.innerHTML = '';
+  images.forEach(image => {
+    const imageElement = document.createElement('img');
+    imageElement.src = image.url;
+    imageList.appendChild(imageElement);
+  });
+}
+
+// Добавляем обработчик события нажатия на кнопку
+document.getElementById('requestButton').addEventListener('click', handleRequestButtonClick);
+
+// Загрузка изображений при загрузке страницы
+document.addEventListener('DOMContentLoaded', () => {
+  const lastRequestData = localStorage.getItem('lastRequestData');
+  if (lastRequestData) {
+    displayImages(JSON.parse(lastRequestData));
+  }
+});
+
+// Сохранение данных последнего запроса в localStorage
+function saveLastRequestData(data) {
+  localStorage.setItem('lastRequestData', JSON.stringify(data));
+}
+
+// Вызываем функцию сохранения данных после успешного запроса
+displayImages(data).then(() => {
+  saveLastRequestData(data);
+});
+</script>
+
+</body>
+</html>

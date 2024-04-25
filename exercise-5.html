@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Задачи пользователя</title>
+<style>
+  .completed {
+    text-decoration: line-through;
+  }
+</style>
+</head>
+<body>
+
+<input type="number" id="userIdInput">
+<button id="getTasksButton">Получить список задач</button>
+
+<div id="tasksList"></div>
+
+<script>
+// Функция для получения списка задач
+function getTasks() {
+  // Получаем значение id пользователя из поля ввода
+  const userId = document.getElementById('userIdInput').value;
+  if (!userId || isNaN(userId) || userId < 1) {
+    alert('Пожалуйста, введите корректное число пользователя.');
+    return;
+  }
+
+  // Формируем URL для запроса
+  const url = `https://jsonplaceholder.typicode.com/users/${userId}/todos`;
+
+  // Отправляем запрос с помощью fetch
+  fetch(url)
+    .then(response => response.json())
+    .then(tasks => {
+      // Очищаем предыдущий список задач
+      document.getElementById('tasksList').innerHTML = '';
+
+      // Добавляем каждый элемент списка задач в DOM
+      tasks.forEach(task => {
+        const listItem = document.createElement('li');
+        listItem.className = task.completed ? 'completed' : '';
+        listItem.textContent = task.title;
+        document.getElementById('tasksList').appendChild(listItem);
+      });
+    })
+    .catch(error => {
+      // Если пользователь с таким id не существует, выводим сообщение
+      if (error.status === 404) {
+        alert('Пользователь с указанным id не найден.');
+      } else {
+        alert('Произошла ошибка при получении списка задач.');
+      }
+    });
+}
+
+// Добавляем обработчик события нажатия на кнопку
+document.getElementById('getTasksButton').addEventListener('click', getTasks);
+</script>
+
+</body>
+</html>
